@@ -24,7 +24,7 @@ export default async function AuthMiddleware(c: Context, next: Next) {
       return c.text("Invalid token payload", 401);
     }
 
-    c.header("username", username);
+    c.req.raw.headers.set("username", username);
     await next();
   } catch (err) {
     return c.text("Token verification failed ", 404);

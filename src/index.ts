@@ -4,9 +4,11 @@ import store from "./store/store";
 import type { user } from "./store/user";
 import jwt from "jsonwebtoken";
 import JWTsecret from "./Auth/secret";
+import AuthMiddleware from "./Auth/jwt";
 
 const app = new Hono();
 app.use(cors());
+app.use("/auth/*", AuthMiddleware);
 
 app.get("/hello", async (c) => {
   return c.text("Hello From Hono!");
@@ -56,6 +58,20 @@ app.post("/lognin", async (c) => {
 
   c.header("Authorization", `Bearer ${token}`);
   return c.text("JWT token sent in Authorization header");
+});
+
+app.get("/auth/userinfo", async (c) => {
+  const username = c.req.header("username");
+  if (!username) {
+    return c.text("Error: username null");
+  }
+
+  const userinfo = store[username];
+
+  return c.json({
+    username: username,
+    password: userinfo?.hpwd,
+  });
 });
 
 export default app;
