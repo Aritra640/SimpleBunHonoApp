@@ -5,6 +5,7 @@ import type { user } from "./store/user";
 import jwt from "jsonwebtoken";
 import JWTsecret from "./Auth/secret";
 import AuthMiddleware from "./Auth/jwt";
+import { upgradeWebSocket } from "hono/bun";
 
 const app = new Hono();
 app.use(cors());
@@ -73,5 +74,15 @@ app.get("/auth/userinfo", async (c) => {
     password: userinfo?.hpwd,
   });
 });
+
+
+app.get("/ping", upgradeWebSocket((c) => {
+  return {
+    open(ws) {
+      console.log("Websocket connection established!");
+      ws.send("Welcome send 'ping' or 'pong'");
+    }
+  }
+}))
 
 export default app;
